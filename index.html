@@ -1,12 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz you will?</title>
-    <link rel="stylesheet" href="./asset/style.css"/>
+    <link rel="stylesheet" href="./asset/style.css" />
 </head>
+
 <body>
     <!-- start Quiz button -->
     <div class="start_btn"><button>Start Quiz</button></div>
@@ -68,8 +69,14 @@
             <button class="restart">Replay Quiz</button>
             <button class="quit">Quit Quiz</button>
         </div>
-    </div>
 
+
+        <div id="scoreboard">
+            <input id="input" placeholder="Enter name here">
+            <submit id="submit">Submit Here</submit>
+            <ol id="highscore"></ol>
+        </div>
+    </div>
     <!-- Inside this JavaScript file I've inserted Questions and Options only -->
     <script src="./asset/questions.js"></script>
 
@@ -77,4 +84,5 @@
     <script src="./asset/script.js"></script>
 
 </body>
+
 </html>
