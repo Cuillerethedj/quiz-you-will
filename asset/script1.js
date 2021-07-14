@@ -5,9 +5,13 @@ var timerInterval;
 var score;
 
 //Selectors
-var timerEl = document.querySelector("#timer")
+var timerEl = document.querySelector("#timer");
 var questionsScreen = document.querySelector("#questionsScreen");
-var answersEl = document.querySelector("#answers")
+var answersEl = document.querySelector("#answers");
+var scoreEl = document.querySelector("#score");
+var nameInput = document.querySelector("#nameInput")
+var submitEl = document.querySelector("#submit")
+var highScore = document.querySelector("#highscoreList")
 
 
 var questions = [{
@@ -64,7 +68,7 @@ function startQuestions() {
 	currentQuestion.choices.forEach(function (choice, i) {
 		var choiceBtn = document.createElement("button");
 		choiceBtn.setAttribute("class", "choice");
-		choiceBtn.setAttribute("value", choice);
+		choiceBtn.value = choice;
 		choiceBtn.textContent = i + 1 + ". " + choice;
 		choiceBtn.addEventListener("click", answerBtnClicked);
 		answersEl.appendChild(choiceBtn);
@@ -72,7 +76,31 @@ function startQuestions() {
 }
 
 function answerBtnClicked() {
-	
+	if (questions[questionIndex].correctAnswer == this.value)
+	{
+		if (questionIndex < questions.length -1){
+			questionIndex++ 
+			startQuestions()
+		}
+		else {
+			endGame()
+		}
+	}
+	else{
+		if (questionIndex < questions.length -1){
+			time = time -15
+			questionIndex++ 
+			startQuestions()
+		}
+		else { time = time -15
+			endGame()
+		}
+	}
+}
+
+function createList() {
+	var list = document.createElement("li");
+	return list;
 }
 
 
@@ -80,8 +108,46 @@ function answerBtnClicked() {
 
 
 
-
 function endGame() {
+	questionsScreen.setAttribute("class", "hide");
 	clearInterval(timerInterval);
+	scoreEl.removeAttribute("class", "hide");
+	score = getLocalStorage()
+	submitEl.addEventListener("click",store);
+}
+function store()
+{
+	var name = nameInput.value;
+	var person = 
+	{
+		name: name,
+		score: time,
+	}
+	score.push(person);
+	sort(score);
+	localStorage.setItem("highscore", JSON.stringify(score));
+	outputHighscore(score, highScore);
+}
+function getLocalStorage() {
+	if (localStorage.getItem("highscore") === null) {
+		return [];
+	} else {
+		return JSON.parse(localStorage.getItem("highscore"));
+	}
+}
+function sort(highscore) {
+	highscore = highscore.sort(function(a, b) {
+		return a.score - b.score
+	});
+	highscore = highscore.reverse();
+	return highscore;
+}
+function outputHighscore(score, highScore) {
+	for (var i = 0; i < score.length; i++) {
+		var currentPerson = score[i];
+		var listItem = createList();
+		listItem.textContent = "Name: " + currentPerson.name + " Score: " + currentPerson.score;
+		highScore.appendChild(listItem);
+	}
 }
 document.querySelector("#startGame").addEventListener("click", start)
