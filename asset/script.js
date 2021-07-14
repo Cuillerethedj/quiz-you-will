@@ -1,262 +1,244 @@
-//selecting all required elements
-var start_btn = document.querySelector(".start_btn button");
-var info_box = document.querySelector(".info_box");
-var exit_btn = info_box.querySelector(".buttons .quit");
-var continue_btn = info_box.querySelector(".buttons .restart");
-var quiz_box = document.querySelector(".quiz_box");
-var result_box = document.querySelector(".result_box");
-var option_list = document.querySelector(".option_list");
-var time_line = document.querySelector("header .time_line");
-var timeText = document.querySelector(".timer .time_left_txt");
-var timeCount = document.querySelector(".timer .timer_sec");
-var highScore = [];
-var highListHtml = document.querySelector("#highscore");
-var inputHtml = document.querySelector("#input");
-var submitHtml = document.querySelector("submit");
+// HTML RECALLS----------------------------------
+questionaireHTML = document.querySelector(".questionaire");
+listHTML = document.querySelector("#list");
+highscoreHTML = document.querySelector("#highscore");
+questionHTML = document.querySelector("#question");
+answer1HTML = document.querySelector("#answer1");
+answer2HTML = document.querySelector("#answer2");
+answer3HTML = document.querySelector("#answer3");
+answer4HTML = document.querySelector("#answer4");
+startGameHTML = document.querySelector("#startGame");
+time = document.querySelector("#timer");
+titlePageHTML = document.querySelector(".titlePage");
+scoreHTML = document.querySelector("#score");
+hListHTML = document.querySelector("#highscoreList");
+nameHTML = document.querySelector("#nameInput");
+submitHTML = document.querySelector("#submit");
 
+startGameHTML.addEventListener("click", function(a) {
+    a.stopPropagation();
+    start();
+})
 
+// Javascript Variables----------------------------------------
 
+// Time Left For Game
+timeLeft = 100;
 
+// Keeps track of high score
+var highscore = [];
 
-// if startQuiz button clicked
-start_btn.onclick = () => {
-    highScore = getLocalStorage(highScore);
-    info_box.classList.add("activeInfo"); //show info box
-}
+// Questions to be asked
+var questions = [
+    {
+        question: "Who is Han Solos Best Friend?",
+        choices: ["Chewbaca","Princess Leia","Luke Skywalker","Lando"],
+        correctAnswer: "Chewbaca"
+    },
+    {
+        question: "In Star Wars, what do they call the invisible power that binds the galaxy together?",
+        choices: ["The Funk","The Saab","The Force","The Darkness"],
+        correctAnswer: "The Force"
+    },
+    {
+        question: "How old was Yoda when he died",
+        choices: ["19","86","4000","900"],
+        correctAnswer: "900"
+    },
+    {
+        question: "What species is Jabba?",
+        choices: ["Turtle","Lizard","Hutt","Hippo"],
+        correctAnswer: "Hutt"
+    }]
 
-// if exitQuiz button clicked
-exit_btn.onclick = () => {
-    info_box.classList.remove("activeInfo"); //hide info box
-}
-
-// if continueQuiz button clicked
-continue_btn.onclick = () => {
-    // info_box.classList.remove("activeInfo"); //hide info box
-    quiz_box.classList.add("activeQuiz"); //show quiz box
-    showQuetions(0); //calling showQestions function
-    queCounter(1); //passing 1 parameter to queCounter
-    startTimer(15); //calling startTimer function
-    startTimerLine(0); //calling startTimerLine function
-}
-
-let timeValue = 15;
-let que_count = 0;
-let que_numb = 1;
-let userScore = 100;
-let counter;
-let counterLine;
-let widthValue = 0;
-
-var restart_quiz = result_box.querySelector(".buttons .restart");
-var quit_quiz = result_box.querySelector(".buttons .quit");
-
-// if restartQuiz button clicked
-restart_quiz.onclick = () => {
-    quiz_box.classList.add("activeQuiz"); //show quiz box
-    result_box.classList.remove("activeResult"); //hide result box
-    timeValue = 15;
-    que_count = 0;
-    que_numb = 1;
-    userScore = 100;
-    widthValue = 0;
-    showQuetions(que_count); //calling showQestions function
-    queCounter(que_numb); //passing que_numb value to queCounter
-    clearInterval(counter); //clear counter
-    clearInterval(counterLine); //clear counterLine
-    startTimer(timeValue); //calling startTimer function
-    startTimerLine(widthValue); //calling startTimerLine function
-    timeText.textContent = "Time Left"; //change the text of timeText to Time Left
-    next_btn.classList.remove("show"); //hide the next button
-}
-
-// if quitQuiz button clicked
-quit_quiz.onclick = () => {
-    window.location.reload(); //reload the current window
-}
-
-var next_btn = document.querySelector("footer .next_btn");
-var bottom_ques_counter = document.querySelector("footer .total_que");
-
-// if Next Que button clicked
-next_btn.onclick = () => {
-    if (que_count < questions.length - 1) { //if question count is less than total question length
-        que_count++; //increment the que_count value
-        que_numb++; //increment the que_numb value
-        showQuetions(que_count); //calling showQestions function
-        queCounter(que_numb); //passing que_numb value to queCounter
-        clearInterval(counter); //clear counter
-        clearInterval(counterLine); //clear counterLine
-        startTimer(timeValue); //calling startTimer function
-        startTimerLine(widthValue); //calling startTimerLine function
-        timeText.textContent = "Time Left"; //change the timeText to Time Left
-        next_btn.classList.remove("show"); //hide the next button
-    } else {
-        clearInterval(counter); //clear counter
-        clearInterval(counterLine); //clear counterLine
-        showResult(); //calling showResult function
+// Creates List To Be Outputted
+    function createList() {
+        var list = document.createElement("li");
+        return list;
     }
-}
 
-// getting questions and options from array
-function showQuetions(index) {
-    var que_text = document.querySelector(".que_text");
-
-    //creating a new span and div tag for question and option and passing the value using array index
-    let que_tag = '<span>' + questions[index].numb + ". " + questions[index].question + '</span>';
-    let option_tag = '<div class="option"><span>' + questions[index].options[0] + '</span></div>' +
-        '<div class="option"><span>' + questions[index].options[1] + '</span></div>' +
-        '<div class="option"><span>' + questions[index].options[2] + '</span></div>' +
-        '<div class="option"><span>' + questions[index].options[3] + '</span></div>';
-    que_text.innerHTML = que_tag; //adding new span tag inside que_tag
-    option_list.innerHTML = option_tag; //adding new div tag inside option_tag
-
-    var option = option_list.querySelectorAll(".option");
-
-    // set onclick attribute to all available options
-    for (i = 0; i < option.length; i++) {
-        option[i].setAttribute("onclick", "optionSelected(this)");
+    function hideTitle() {
+        titlePageHTML.setAttribute("class", "hide")
     }
-}
-// creating the new div tags which for icons
-let tickIconTag = '<div class="icon tick"><i class="fas fa-check"></i></div>';
-let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
 
-//if user clicked on option
-function optionSelected(answer) {
-    clearInterval(counter); //clear counter
-    clearInterval(counterLine); //clear counterLine
-    let userAns = answer.textContent; //getting user selected option
-    let correcAns = questions[que_count].answer; //getting correct answer from array
-    var allOptions = option_list.children.length; //getting all option items
+    function showGame() {
+        questionaireHTML.removeAttribute("class", "hide");
+    }
 
-    if (userAns == correcAns) { //if user selected option is equal to array's correct answer
+    function showHighscore() {
+        scoreHTML.setAttribute("class", "hide");
+    }
 
-        answer.classList.add("correct"); //adding green color to correct selected option
-        answer.insertAdjacentHTML("beforeend", tickIconTag); //adding tick icon to correct selected option
-        console.log("Correct Answer");
-        console.log("Your correct answers = " + userScore);
-    } else {
-        answer.classList.add("incorrect"); //adding red color to correct selected option
-        answer.insertAdjacentHTML("beforeend", crossIconTag); //adding cross icon to correct selected option
-        console.log("Wrong Answer");
-        userScore -= 25;
+       
 
+    function intro() {
+        
+        questionaireHTML.setAttribute("class", "hide");
+        scoreHTML.setAttribute("class", "hide");
+        titlePageHTML.removeAttribute("class", "hide");
 
-        for (i = 0; i < allOptions; i++) {
-            if (option_list.children[i].textContent == correcAns) { //if there is an option which is matched to an array answer 
-                option_list.children[i].setAttribute("class", "option correct"); //adding green color to matched option
-                option_list.children[i].insertAdjacentHTML("beforeend", tickIconTag); //adding tick icon to matched option
-                console.log("Auto selected correct answer.");
+        highscoreHTML.addEventListener("click", function(a) {
+            a.stopPropagation();
+            getHighscore();
+        })
+    }
+
+    function start() {
+        // Show the questionaire:
+        questionaireHTML.removeAttribute("class", "hide");
+
+        // Hide the title:
+        titlePageHTML.setAttribute("class", "hide");
+
+        var timeInterval = setInterval(function() {
+            timeLeft--;
+            time.innerHTML = "Time: " + timeLeft;
+
+            if (timeLeft == 0) {
+                clearInterval(timeInterval);
+                gameOver();
+            }
+        }, 1000);
+
+        var i = 0;
+
+        function changeQuestion(i) {
+            if (i < questions.length) {
+                questionHTML.innerHTML = questions[i].question;
+                answer1HTML.innerHTML = questions[i].answer1.text;
+                answer2HTML.innerHTML = questions[i].answer2.text;
+                answer3HTML.innerHTML = questions[i].answer3.text;
+                answer4HTML.innerHTML = questions[i].answer4.text;
+            } else {
+                clearInterval(timeInterval);
+                gameOver();
             }
         }
-    }
-    for (i = 0; i < allOptions; i++) {
-        option_list.children[i].classList.add("disabled"); //once user select an option then disabled all options
-    }
-    next_btn.classList.add("show"); //show the next button if user selected any option
-}
 
-function showResult() {
-    info_box.classList.remove("activeInfo"); //hide info box
-    quiz_box.classList.remove("activeQuiz"); //hide quiz box
-    result_box.classList.add("activeResult"); //show result box
-    var scoreText = result_box.querySelector(".score_text");
-    if (userScore > 3) { // if user scored more than 3
-        //creating a new span tag and passing the user score number and total question number
-        let scoreTag = '<span>and congrats! , You got <p>' + userScore + ' out of 100 </p></span>';
-        scoreText.innerHTML = scoreTag; //adding new span tag inside score_Text
-    }
-    submitHtml.addEventListener("click", function() {
+        // First Choice
+        answer1HTML.addEventListener("click", function(event) {
+            event.stopPropagation();
+            debugger;
+            if (questions[i].answer1.correct == true) {
+                i++;
+                changeQuestion(i);
+            } else {
+                timeLeft = timeLeft - 15;
+                i++;
+                changeQuestion(i);
 
-        console.log(highScore)
-        var person = {
-            name: inputHtml.value,
-            score: userScore
-        }
-        highScore.push(person);
-        console.log(highScore);
-        sort(highScore)
-        display(highScore, highListHtml)
-        localStorage.setItem("highscore", JSON.stringify(highScore))
-
-    })
-
-
-}
-
-function startTimer(time) {
-    counter = setInterval(timer, 1000);
-
-    function timer() {
-        timeCount.textContent = time; //changing the value of timeCount with time value
-        time--; //decrement the time value
-        if (time < 9) { //if timer is less than 9
-            let addZero = timeCount.textContent;
-            timeCount.textContent = "0" + addZero; //add a 0 before time value
-        }
-        if (time < 0) { //if timer is less than 0
-            clearInterval(counter); //clear counter
-            timeText.textContent = "Time Off"; //change the time text to time off
-            var allOptions = option_list.children.length; //getting all option items
-            let correcAns = questions[que_count].answer; //getting correct answer from array
-            for (i = 0; i < allOptions; i++) {
-                if (option_list.children[i].textContent == correcAns) { //if there is an option which is matched to an array answer
-                    option_list.children[i].setAttribute("class", "option correct"); //adding green color to matched option
-                    option_list.children[i].insertAdjacentHTML("beforeend", tickIconTag); //adding tick icon to matched option
-                    console.log("Time Off: Auto selected correct answer.");
-                }
             }
-            for (i = 0; i < allOptions; i++) {
-                option_list.children[i].classList.add("disabled"); //once user select an option then disabled all options
+        });
+
+        //Second Choice
+        answer2HTML.addEventListener("click", function(event) {
+            event.stopPropagation();
+            debugger;
+            if (questions[i].answer2.correct == true) {
+                i++;
+                changeQuestion(i);
+            } else {
+                timeLeft = timeLeft - 15;
+                i++;
+                changeQuestion(i);
             }
-            next_btn.classList.add("show"); //show the next button if user selected any option
+        });
+
+        // Third Choice
+        answer3HTML.addEventListener("click", function(event) {
+            event.stopPropagation();
+            debugger;
+            if (questions[i].answer3.correct == true) {
+                i++;
+                changeQuestion(i);
+            } else {
+                timeLeft = timeLeft - 15;
+                i++;
+                changeQuestion(i);
+            }
+        });
+
+        //Fourth Choice
+        answer4HTML.addEventListener("click", function(event) {
+            event.stopPropagation();
+            debugger;
+            if (questions[i].answer4.correct == true) {
+                i++;
+                changeQuestion(i);
+            } else {
+                timeLeft = timeLeft - 15;
+                i++;
+                changeQuestion(i);
+            }
+        });
+
+    }
+
+    function getLocalStorage(highscore) {
+        if (localStorage.getItem("highscore") === null) {
+            return highscore;
+        } else {
+            return JSON.parse(localStorage.getItem("highscore"));
         }
     }
-}
 
-function startTimerLine(time) {
-    counterLine = setInterval(timer, 29);
+    function sort(highscore) {
+        highscore = highscore.sort(function(a, b) {
+            return a.score - b.score
+        });
+        highscore = highscore.reverse();
+        return highscore;
+    }
 
-    function timer() {
-        time += 1; //upgrading time value with 1
-        time_line.style.width = time + "px"; //increasing width of time_line with px by time value
-        if (time > 549) { //if time value is greater than 549
-            clearInterval(counterLine); //clear counterLine
+    function outputHighscore(highscore, hListHTML) {
+        for (var i = 0; i < highscore.length; i++) {
+            var currentPerson = highscore[i];
+            var listItem = createList();
+            listItem.textContent = "Name: " + currentPerson.name + " Score: " + currentPerson.score;
+            hListHTML.appendChild(listItem);
         }
     }
-}
 
-function queCounter(index) {
-    //creating a new span tag and passing the question number and total question
-    let totalQueCounTag = '<span><p>' + index + '</p> of <p>' + questions.length + '</p> Questions</span>';
-    bottom_ques_counter.innerHTML = totalQueCounTag; //adding new span tag inside bottom_ques_counter
-}
+    function getHighscore() {
+        questionaireHTML.setAttribute("class", "hide");
+        titlePageHTML.setAttribute("class", "hide");
+        scoreHTML.removeAttribute("class", "hide");
+        nameHTML.setAttribute("class", "hide");
+        submitHTML.setAttribute("class", "hide");
+        highscore = getLocalStorage(highscore);
+        outputHighscore(highscore, hListHTML);
 
-function getLocalStorage(highScore) {
-    if (localStorage.getItem("highscore") === null) {
-        return highScore;
+        highscoreHTML.addEventListener("click", function() {
+            hListHTML.innerHTML = "";
+            debugger;
+            intro();
+        })
+    }
 
-    } else {
-        return JSON.parse(localStorage.getItem("highscore"))
+    function gameOver() {
+        questionaireHTML.setAttribute("class", "hide");
+        titlePageHTML.setAttribute("class", "hide");
+        scoreHTML.removeAttribute("class", "hide");
+        highscoreHTML.setAttribute("class", "hide");
+        nameHTML.removeAttribute("class", "hide");
+        submitHTML.removeAttribute("class", "hide");
 
+        highscore = getLocalStorage(highscore);
+        time = timeLeft;
+
+        submitHTML.addEventListener("click", function() {
+            nameHTML.setAttribute("class", "hide");
+            submitHTML.setAttribute("class", "hide");
+            var name = nameHTML.value
+            var person = {
+                name: name,
+                score: timeLeft
+            }
+
+            highscore.push(person);
+            sort(highscore);
+            outputHighscore(highscore, hListHTML);
+            localStorage.setItem("highscore", JSON.stringify(highscore));
+        })
 
     }
-}
-
-function sort(highScore) {
-    highScore = highScore.sort(function(a, b) { return a.score - b.score })
-    highScore = highScore.reverse();
-    return highScore
-}
-
-function display(highScore, highListHtml) {
-    for (var index = 0; index < highScore.length; index++) {
-        var person = highScore[index];
-        console.log(highScore);
-        var listItem = document.createElement("li");
-        listItem.textContent = "name: " + person.name + " score: " + person.score;
-        highListHtml.appendChild(listItem);
-
-
-    }
-}
